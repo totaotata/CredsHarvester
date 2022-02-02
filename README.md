@@ -1,5 +1,5 @@
 # CredsHarvester
-===========
+
 
 Tool to browse, analyze and download all folders, files, available in network shares from several patterns (extensions, filename and regex) in an automated way. It supports SMB/Samba, FTP, SSH & SFTP
 
