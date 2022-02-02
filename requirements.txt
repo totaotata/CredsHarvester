@@ -1,0 +1,3 @@
+paramiko==2.9.2
+pysmb==1.2.7
+typer==0.4.0
