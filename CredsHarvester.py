@@ -5,8 +5,6 @@ import paramiko
 from smb.SMBConnection import SMBConnection
 from stat import S_ISDIR, S_ISREG
 import tempfile
-import traceback
-import sys
 from io import StringIO
 app = typer.Typer()
 
