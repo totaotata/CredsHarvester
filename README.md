@@ -8,4 +8,5 @@ Tool to browse, analyze and download all folders, files, available in network sh
 + `pip install -r requirements.txt`
 
 How to use :
-python3 CredsHarvester smb 192.168.1.2 -u username -p password 
+
+`python3 CredsHarvester smb 192.168.1.2 -u username -pwd password
