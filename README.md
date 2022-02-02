@@ -20,3 +20,8 @@ Tool to browse, analyze and download all folders, files, available in network sh
 ## To Do :
 - add wordList comparation
 - Handle error
+
+
+# Tips
+
+- you can easily test this tool on the vulnerable metasploitable infrastructure or on the infrastructure of your choice ;)

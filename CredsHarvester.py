@@ -40,40 +40,6 @@ def smb(host: Optional[str] = typer.Option(..., "-h"),
             fw.close()
         print('download finished')
         smb.smbClient.close()
-        # fileObj = tempfile.NamedTemporaryFile()
-        # try:
-        #     with open(filename, "w") as file:
-        #         smb.smbClient.retrieveFile('\\\msfadmin',filename,fileObj, timeout=600)
-        #         print(filename + " has been downloaded in current directory")
-
-        # except Exception as e:
-        #     print(e)
-        # finally:
-        #     fileObj.close() 
-        # try:
-        #     for share in smb.smbClient.listShares():
-        #         print("[*] Share name:  %s " % share.name + '=> ' + share.comments)
-        #         filelist = smb.smbClient.listPath(share.name,'/')
-        #         for f in filelist:
-        #             print("[*] Found : %s " % f.filename)
-        #         print('')
-        #         print('--------------------------------')
-        #         print('')
-        # except Exception:
-        #     print("Failed to list this share")
-        # finally:
-        #     pathselect = typer.prompt("In which share do you want to download a file ? (just type name of file) ")
-        #     filename = typer.prompt("Which file do you want to download ? (just type name of file) ")
-        #     fileObj = tempfile.NamedTemporaryFile()
-        #     try:
-        #         with open(filename, "wb") as file:
-        #             smb.smbClient.retrieveFile(pathselect,filename,fileObj)
-        #         print(filename + " has been downloaded in current directory")
-        #         fileObj.close()    
-        #     except Exception:
-        #         print('failed to download file')
-        #         return False
-        # return True
     else:
         print('Bad id/connection')
         return False
@@ -92,6 +58,7 @@ def ssh(host: Optional[str] = typer.Option(..., "-h"),
     print(lines)
 
 @app.command()
+@app.command()
 def sftp(host: Optional[str] = typer.Option(..., "-h"),
         username: Optional[str] = typer.Option(..., "-u"),
         password: Optional[str] = typer.Option(..., "-pwd"),
@@ -108,28 +75,42 @@ def sftp(host: Optional[str] = typer.Option(..., "-h"),
             print(entry.filename + "/")
         elif S_ISREG(mode):
             print(entry.filename + "")
-    typer.prompt("What do you want to do now ?")
+    filename = typer.prompt("Which file do you want to download ?")
+    try:
+        sftp.get("./"+filename, ".\\"+filename)
+    except:
+        print("Error : download fail")
     raise typer.Exit()
 
 @app.command()
 def ftp(
         host: Optional[str] = typer.Option(..., "-h", help="Ip or hostname of target."),
-        username: Optional[str] = typer.Option(..., "-u"),
-        password: Optional[str] = typer.Option(..., "-pwd"),
+        username: Optional[str] = typer.Option(..., "-u", help="Username"),
+        password: Optional[str] = typer.Option(..., "-pwd", help="Password"),
         port: Optional[int] = typer.Option(21, "-p")):
     try:
-        ftp = FTP(host)
+        ftp = FTP(host) # connexion à l'hôte
     except:
         print("Invalid host")
         exit()
 
-    ftp.login(username, password)  # user anonymous, passwd anonymous@
+    try:
+        ftp.login(username, password)  # user anonymous, passwd anonymous@
+    except:
+        print("Invalid username/password")
+        exit()
     welcomeMessage = ftp.getwelcome()
     print(welcomeMessage)
     print('[+] 230 Login successful.')
     print('Root directory : ')
-    ftp.cwd('./')
-    ftp.retrlines('LIST')
+    try:
+        ftp.cwd('./')
+        ftp.retrlines('LIST')
+        filename = typer.prompt("Which file do you want to download ?")
+        with open(filename, "wb") as file:
+            ftp.retrbinary("RETR " + filename, file.write)
+    except:
+        print('error')
     ftp.quit()
 
 if __name__ == "__main__":
