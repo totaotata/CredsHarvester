@@ -7,7 +7,7 @@ Tool to browse, analyze and download all folders, files, available in network sh
 + `cd CredsHarvester`
 + `pip install -r requirements.txt`
 
-How to use :
+## How to use :
 
 
 - python3 CredsHarvester --help
@@ -17,6 +17,6 @@ How to use :
 - python3 CredsHarvester ssh 192.168.1.2 -u username -pwd password -p(optional port, default 22)
 
 
-To Do :
+## To Do :
 - add wordList comparation
 - Handle error
