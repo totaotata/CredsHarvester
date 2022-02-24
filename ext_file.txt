@@ -1,0 +1,7 @@
+cnf
+ssh
+htpasswd
+kdbx
+docx
+csv
+htaccess
