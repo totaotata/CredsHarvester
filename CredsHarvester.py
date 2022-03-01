@@ -1,3 +1,4 @@
+import logging
 import typer
 from ftplib import FTP
 from typing import Optional
@@ -6,41 +7,78 @@ from smb.SMBConnection import SMBConnection
 from stat import S_ISDIR, S_ISREG
 import tempfile
 from io import StringIO
+from pathlib import Path
+
+
 app = typer.Typer()
 
 @app.command()
-def smb(host: Optional[str] = typer.Option(..., "-h"),
-         username: Optional[str] = typer.Option(..., "-u"),
-         password: Optional[str] = typer.Option(..., "-pwd"),
-         port: Optional[str] = typer.Option(139, "-P")):
+def smb(IP: Optional[str] = typer.Option(..., "-h"),         username: Optional[str] = typer.Option(..., "-u"),
+         password: Optional[str] = typer.Option(..., "-p"),
+         port: Optional[str] = typer.Option(139, "-P"),
+         ext_file: Optional[Path] = typer.Option(None, "-w")):
 
-    smb.smbClient = SMBConnection(username, password, "", "")
-    if smb.smbClient.connect(host, port):
-        print("[+] SMB Connection Success ... ")
-        print("[+] Listing the Shared resources")
-        filelist = smb.smbClient.listPath('msfadmin','/')
+    conn = SMBConnection(username, password, "", "")
 
-        for share in smb.smbClient.listShares():
-             print("[*] Share name:  %s " % share.name + '=> ' + share.comments)
-        for f in filelist:
-                print("[*] Found : %s " % f.filename)
-        filename = typer.prompt("Which file do you want to download ? (just type name of file) ")
-        print('Download = ' + '/' + filename)
-        attr = smb.smbClient.getAttributes('msfadmin', '/'+filename)
-        print('Size = %.1f kB' % (attr.file_size / 1024.0))
-        print('start download')
-        file_obj = tempfile.NamedTemporaryFile()
-        file_attributes, filesize = smb.smbClient.retrieveFile('msfadmin', '/'+filename, file_obj)
-        fw = open(filename, 'wb')
-        file_obj.seek(0)
-        for line in file_obj:
-            fw.write(line)
-            fw.close()
-        print('download finished')
-        smb.smbClient.close()
-    else:
-        print('Bad id/connection')
-        return False
+    def parse_file(share, filename, IP):
+        if ext_file is None:
+                typer.echo("No config file")
+                raise typer.Abort()
+        if ext_file.is_file():
+            text = ext_file.read_text()
+            file_ext = (filename.split('/')[-1]).split('.')[-1] or "empty"
+
+            if file_ext.lower() in text:
+                typer.secho("Found interesting file: " + filename, fg=typer.colors.GREEN)
+                # print(ext_file.read_text())
+
+        elif ext_file.is_dir():
+            typer.echo("Config is a directory, will use all its config files")
+        elif not ext_file.exists():
+            typer.echo("The config doesn't exist")
+
+            line_counter = 0 
+            hits = 0 
+            file_obj = tempfile.NamedTemporaryFile()
+           
+            #    self.db.insertFileFinding(filename, share, IP, retrieveTimes(share,filename))
+
+    def explore_path(path,shared_folder,IP):
+           #print (depth)
+           try:
+             for p in conn.listPath(shared_folder, path):
+                 if p.filename!='.' and p.filename!='..':
+                     parentPath = path
+                     if not parentPath.endswith('/'):
+                         parentPath += '/'
+                     if p.isDirectory:   
+                        # print(" Goto Directory => ", parentPath+p.filename)
+                        explore_path(parentPath+p.filename,shared_folder,IP)        
+                     else:
+                        #  print( 'File found, go parsing : '+ parentPath+p.filename)
+                         
+                         parse_file(shared_folder, parentPath+p.filename, IP)
+           except Exception as e: 
+              print("Error while listing paths in shares: " + str(e))
+        
+    def connect(conn):
+        try:
+            conn.connect(IP, port)
+            print("[+] SMB Connection Success on ", IP)
+        except Exception as e:
+             logging.warning("Detected error while connecting to " + str(IP) + " with message " + str(e))
+        try:   
+            shares = conn.listShares()
+        except Exception as e:
+            logging.warning("Detected error while listing shares on "  + str(IP) + " with message " + str(e))
+
+        for share in shares:
+            if not share.isSpecial and share.name not in ['NETLOGON', 'IPC$', "ADMIN$"]:
+                print("[*] Share name:  %s " % share.name + '=> ' + share.comments)
+                print('Listing file in share: ' + share.name)
+                explore_path("/",share.name,IP)
+    connect(conn)
+   
 
 @app.command()
 def ssh(host: Optional[str] = typer.Option(..., "-h"),

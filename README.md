@@ -11,6 +11,7 @@ Tool to browse, analyze and download all folders, files, available in network sh
 ## How to use :
 
 
+
 - python3 CredsHarvester --help
 - python3 CredsHarvester smb 192.168.1.2 -u username -p password -P(optional port, default 139)
 - python3 CredsHarvester ftp 192.168.1.2 -u username -p password -P(optional port, default 21)
@@ -18,11 +19,13 @@ Tool to browse, analyze and download all folders, files, available in network sh
 - python3 CredsHarvester ssh 192.168.1.2 -u username -p password -P(optional port, default 22)
 
 
+
+
 ## To Do :
 - Add wordList comparation
 - Error handling 
 - Display results
-- Export results
+- Export results to CSV
 
 
 # Tips
