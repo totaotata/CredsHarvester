@@ -5,3 +5,6 @@ kdbx
 docx
 csv
 htaccess
+passwd
+search
+.env

@@ -8,7 +8,7 @@ from stat import S_ISDIR, S_ISREG
 import tempfile
 from io import StringIO
 from pathlib import Path
-
+import textract
 
 app = typer.Typer()
 
@@ -55,7 +55,7 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),         username: Optional[
                         # print(" Goto Directory => ", parentPath+p.filename)
                         explore_path(parentPath+p.filename,shared_folder,IP)        
                      else:
-                        #  print( 'File found, go parsing : '+ parentPath+p.filename)
+                         print( 'File found, go parsing : '+ parentPath+p.filename)
                          
                          parse_file(shared_folder, parentPath+p.filename, IP)
            except Exception as e: 
@@ -83,7 +83,7 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),         username: Optional[
 @app.command()
 def ssh(host: Optional[str] = typer.Option(..., "-h"),
         username: Optional[str] = typer.Option(..., "-u"),
-        password: Optional[str] = typer.Option(..., "-pwd"),
+        password: Optional[str] = typer.Option(..., "-p"),
         port: Optional[int] = typer.Option(22, "-P")):
     command = "ls"
     ssh = paramiko.SSHClient()
@@ -91,13 +91,13 @@ def ssh(host: Optional[str] = typer.Option(..., "-h"),
     ssh.connect(host, port, username, password, banner_timeout=5000)
     stdin, stdout, stderr = ssh.exec_command(command)
     lines = stdout.readlines()
-    print(lines)
+    typer.echo(lines)
 
-@app.command()
+
 @app.command()
 def sftp(host: Optional[str] = typer.Option(..., "-h"),
         username: Optional[str] = typer.Option(..., "-u"),
-        password: Optional[str] = typer.Option(..., "-pwd"),
+        password: Optional[str] = typer.Option(..., "-p"),
         port: Optional[int] = typer.Option(22, "-P")):
     command = "ls"
     transport = paramiko.Transport((host, port))
@@ -122,8 +122,8 @@ def sftp(host: Optional[str] = typer.Option(..., "-h"),
 def ftp(
         host: Optional[str] = typer.Option(..., "-h", help="Ip or hostname of target."),
         username: Optional[str] = typer.Option(..., "-u", help="Username"),
-        password: Optional[str] = typer.Option(..., "-pwd", help="Password"),
-        port: Optional[int] = typer.Option(21, "-p")):
+        password: Optional[str] = typer.Option(..., "-p", help="Password"),
+        port: Optional[int] = typer.Option(21, "-P")):
     try:
         ftp = FTP(host) # connexion à l'hôte
     except:
