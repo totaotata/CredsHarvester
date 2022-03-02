@@ -55,7 +55,7 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),         username: Optional[
                         # print(" Goto Directory => ", parentPath+p.filename)
                         explore_path(parentPath+p.filename,shared_folder,IP)        
                      else:
-                         print( 'File found, go parsing : '+ parentPath+p.filename)
+                        #  print( 'File found, go parsing : '+ parentPath+p.filename)
                          
                          parse_file(shared_folder, parentPath+p.filename, IP)
            except Exception as e: 
