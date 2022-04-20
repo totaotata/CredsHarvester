@@ -9,39 +9,86 @@ import tempfile
 from io import StringIO
 from pathlib import Path
 import textract
+import os
+import random
+import string
 
 app = typer.Typer()
 
 @app.command()
-def smb(IP: Optional[str] = typer.Option(..., "-h"),         username: Optional[str] = typer.Option(..., "-u"),
+def smb(IP: Optional[str] = typer.Option(..., "-h"),
+         username: Optional[str] = typer.Option(..., "-u"),
          password: Optional[str] = typer.Option(..., "-p"),
          port: Optional[str] = typer.Option(139, "-P"),
          ext_file: Optional[Path] = typer.Option(None, "-w")):
 
     conn = SMBConnection(username, password, "", "")
+    def retrieveTextSpecial(file_object):
+        try:
+            # print('retrieveText', file_object.name)
+            # os.rename(file_object.name, file_object.name + ".docx")
+            text = textract.process(file_object.name)
+            return text      
+        except Exception as e: 
+            os.remove(file_object.name)
+            typer.echo("Error while parsing special file " + file_object.name + " with exception: " + str(e))
 
-    def parse_file(share, filename, IP):
-        if ext_file is None:
-                typer.echo("No config file")
-                raise typer.Abort()
+    def filter_by_ext(share, filename, IP):
+        line_counter = 0 
+        hits = 0
+        file_obj = tempfile.NamedTemporaryFile()
+        file_ext = (filename.split('/')[-1]).split('.')[-1] or "empty"
+        if not ext_file.exists():
+                typer.secho("ext_file.txt not found", fg=typer.colors.RED)
+                raise typer.Exit()
+                
         if ext_file.is_file():
             text = ext_file.read_text()
-            file_ext = (filename.split('/')[-1]).split('.')[-1] or "empty"
+            # print("file_ext", file_ext)
+            # if file_ext.lower() in ['docx','doc','docx','eml','epub','gif','jpg','mp3','msg','odt','ogg','pdf','png','pptx','ps','rtf','tiff','tif','wav','xlsx','xls']:
 
             if file_ext.lower() in text:
+                filesize = (conn.getAttributes(share, filename)).file_size 
+                file_attributes, filesize = conn.retrieveFile(share, filename, file_obj)
                 typer.secho("Found interesting file: " + filename, fg=typer.colors.GREEN)
-                # print(ext_file.read_text())
+                specialfile = open(str(''.join(random.choices(string.ascii_uppercase, k = 5))) + "." +file_ext , "ab")
+                file_attributes, filesize = conn.retrieveFile(share, filename, specialfile)
+                lines = (retrieveTextSpecial(specialfile)).split(b'\n')
+                specialfile.close()
+                try:
+                    os.remove(specialfile.name)
+                except Exception as e:
+                    typer.echo("Error deleting the temp file: " + specialfile.name)
+            else:
+                file_obj.seek(0)                
+                lines = file_obj.readlines()
+                            
+            if len(lines) > 0: 
+                for line in lines:
+                    line_counter+=1 
+                    try:
+                        if 'wifi' in line.decode('UTF-8'):
+                            typer.secho("Found words in this line : " + line.decode('UTF-8'), fg=typer.colors.GREEN)
+                    except Exception as e: 
+                        typer.echo("Encountered exception while reading file: " + file_ext + " | Exception: " + str(e), err=True)
+                    # print("line", line)
+                    # try: 
+                    # #  if passwordHW((line.decode("utf-8")).strip("\n"), filename,to_match, line_counter, IP, share):
+                    # #       hits += 1
+                    # #       if hits >= options.hits:
+                    # #           logger.info("Reached max hits for " + filename
+                    # #           break  
+                    # except Exception as e: 
+                    # #    logger.warning("Encountered exception while reading file: " + file_ext + " | Exception: " + str(e))
+                    # #    if isinstance(file_obj, (io.RawIOBase, io.BufferedIOBase)):
+                    # #       options.file_extensions_black = options.file_extensions_black + "," + file_ext
+                    #    break
+            file_obj.close() 
+
 
         elif ext_file.is_dir():
             typer.echo("Config is a directory, will use all its config files")
-        elif not ext_file.exists():
-            typer.echo("The config doesn't exist")
-
-            line_counter = 0 
-            hits = 0 
-            file_obj = tempfile.NamedTemporaryFile()
-           
-            #    self.db.insertFileFinding(filename, share, IP, retrieveTimes(share,filename))
+        #    self.db.insertFileFinding(filename, share, IP, retrieveTimes(share,filename))
 
     def explore_path(path,shared_folder,IP):
            #print (depth)
@@ -56,8 +103,7 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),         username: Optional[
                         explore_path(parentPath+p.filename,shared_folder,IP)        
                      else:
                         #  print( 'File found, go parsing : '+ parentPath+p.filename)
-                         
-                         parse_file(shared_folder, parentPath+p.filename, IP)
+                         filter_by_ext(shared_folder, parentPath+p.filename, IP)
            except Exception as e: 
               print("Error while listing paths in shares: " + str(e))
         
@@ -151,3 +197,5 @@ def ftp(
 
 if __name__ == "__main__":
     app()
+
+
