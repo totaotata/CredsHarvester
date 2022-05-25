@@ -12,9 +12,6 @@ from io import StringIO
 from pathlib import Path
 import textract
 import os
-import random
-import string
-import docx2txt
 
 app = typer.Typer()
 
@@ -29,16 +26,18 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),
 
     conn = SMBConnection(username, password, "", "")
 
-    def retrieveTextSpecial(file_object):
-        try:
-            text = textract.process(file_object.name)
-            print(text)
-            return text
-        except Exception as e:
-            os.remove(file_object.name)
-            print("Error while parsing special file " +
-                  file_object.name + " with exception: " + str(e))
-            return "textractfailed"
+    def searchKeywords(content, filename):
+        with open(keywords_file) as f:
+            # Here f is the file-like object
+            read_data = f.read().split('\n')
+        if keywords_file.is_file():
+            for item in read_data:
+                match = False
+                if item in content:
+                    match = True
+                if match:
+                    typer.secho("[+] Found '" + item + "' keywords in : " + filename, fg=typer.colors.GREEN)     
+            
 
     def filter_by_ext(share, filename, IP):
         line_counter = 0
@@ -48,33 +47,24 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),
         if ext_file.is_file():
             text = ext_file.read_text()
             if file_ext.lower() in text:
-                # display all files with extension
-                # typer.secho("Found interesting extension: " +
-                #             filename, fg=typer.colors.WHITE)
+                # display all files with extension with -v arguments
+                typer.secho("Found interesting extension: " +
+                            filename, fg=typer.colors.WHITE)
 
                 if file_ext.lower() in ['docx', 'doc', 'zip', 'eml', 'epub', 'gif', 'jpg', 'mp3', 'msg', 'odt', 'ogg', 'pdf', 'png', 'pptx', 'ps', 'rtf', 'tiff', 'tif', 'wav', 'xlsx', 'xls']:
                     file = filename.split('/')[2]
                     try:
-                        with open(file, 'wb') as fp:
-                            conn.retrieveFile(share, filename, fp)
-                            text = textract.process(fp.name)
-                            text = text.decode("utf-8").replace("\n", " ").lower()
-                            # typer.echo(text)
-                            if len(text) > 0:
-                                with open(keywords_file) as f:
-                                    # Here f is the file-like object
-                                    read_data = f.read().split('\n')
-                                if keywords_file.is_file():
-                                    for item in read_data:
-                                        match = False
-                                        if item in text:
-                                            match = True
-                                        if match:
-                                            typer.secho("Found " + item + " keywords in : " + filename, fg=typer.colors.GREEN)
-                            os.remove(fp.name)
+                        with open(file, 'wb') as f:
+                            conn.retrieveFile(share, filename, f)
+                            content = textract.process(f.name)
+                            content = content.decode("utf-8").replace("\n", " ").lower()
+                            # typer.echo(content)
+                            if len(content) > 0:
+                                searchKeywords(content, filename)
+                            os.remove(f.name)
                     except Exception as e:
                         typer.echo("Detected error while read file " +
-                                   fp.name + " with message " + str(e))
+                                   f.name + " with message " + str(e))
 
                 # if other file type                                   
                 else:
@@ -82,23 +72,14 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),
                         with tempfile.NamedTemporaryFile() as file_obj:
                             conn.retrieveFile(share, filename, file_obj)
                             file_obj.seek(0)
-                            line = file_obj.read()
-                            line = line.decode(
+                            content = file_obj.read()
+                            content = content.decode(
                                 'utf-8', 'ignore').translate({ord('\u0000'): None})
-                            if len(line) > 0:
-                                with open(keywords_file) as f:
-                                    read_data = f.readlines()
-                                if keywords_file.is_file():
-                                    for item in read_data:
-                                        match = False
-                                        if item in line:
-                                            match = True
-                                        if match:
-                                            typer.secho(
-                                                "Found " + item + " keywords in : " + filename, fg=typer.colors.GREEN)
+                            if len(content) > 0:
+                                searchKeywords(content, filename)
                             file_obj.close()
                     except Exception as e:
-                        typer.echo("Detected error while read file " + item + " with message " + str(e))
+                        typer.echo("Detected error while read file " + filename + " with message " + str(e))
                         
             file_obj.close()
         elif ext_file.is_dir():

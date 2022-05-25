@@ -1,4 +1,2 @@
-txt
 pdf
-html
-pdf
+docx
