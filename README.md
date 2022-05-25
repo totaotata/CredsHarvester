@@ -21,6 +21,9 @@ Tool to browse, analyze and download all folders, files, available in network sh
 - ```python3 CredsHarvester.py ssh 192.168.1.2 -u username -p password -w ext_file.txt -k keywords.txt -P(optional port, default 22)```
 
 
+## Done 
+- recusiv parsing file with textract
+
 ## To Do :
 - Search in file with regex
 - Improve error handling 
