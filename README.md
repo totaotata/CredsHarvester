@@ -22,11 +22,19 @@ Tool to browse, analyze and download all folders, files, available in network sh
 
 
 ## To Do :
-- Search in file with regex
-- Improve error handling 
-- Insert result in SQLite database
-- Export results to CSV
-- Search with a list of login/password
+- [...] Add features to list all files and share with READ,WRITE access mode and export in .txt file with index line.
+- [...] Export results to CSV
+- [...] Add entrypoint option to start scan
+- [?] Add possibilites to Stop scan and re-play on the same last point
+- [] refacto with os.path lib (is_directory)
+- [?] Create Class for arguments
+
+- [] Insert result in SQLite database for better view and reserch
+- [v2] Search with a list of login/password
+
+## Done :
+- [X] Search in file with regex
+- [X] Improve error handling 
 
 # Tips
 

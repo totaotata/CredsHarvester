@@ -1,1 +1,6 @@
-mysuperkeyword
+password
+username
+mot de passe
+pwd
+passwd
+api_key
