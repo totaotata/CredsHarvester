@@ -1,1 +1,3 @@
-mysuperkeyword
+mot de passe
+password
+passwords
