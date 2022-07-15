@@ -1,9 +1,1 @@
-docx
-pdf
 txt
-csv
-kdbx
-txt
-pem
-key
-xlsx

@@ -25,8 +25,6 @@ with open('export.csv', 'w', encoding='UTF8') as f:
     writer.writerow(header)
 
 # common function
-
-
 def exportCSV(share, type, path, item):
     try:
         data = [share, type, path, item]
@@ -136,9 +134,9 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),
         keywords_file: Optional[Path] = typer.Option(None, "-k")):
 
     if not domainName:
-        conn = SMBConnection(username, password, '', '', is_direct_tcp=True)
+        conn = SMBConnection(username, password, 'user', 'user', is_direct_tcp=True)
     else:
-        conn = SMBConnection(username, password, '', '', domain=domainName, use_ntlm_v2=True,
+        conn = SMBConnection(username, password, 'user', 'user', domain=domainName, use_ntlm_v2=True,
                              sign_options=SMBConnection.SIGN_WHEN_SUPPORTED, is_direct_tcp=True)
 
     def explore_path(path, shared_folder, IP):
@@ -169,7 +167,9 @@ def smb(IP: Optional[str] = typer.Option(..., "-h"),
                             str(IP) + " with message " + str(e) + "try again")
             exit()
         try:
-            shares = conn.listShares(timeout=10)
+            # path = conn.listPath()
+            # print(path)
+            shares = conn.listShares(timeout=30)
             if shares:
                 for share in shares:
                     if not share.isSpecial and share.name not in ['NETLOGON', 'IPC$', "ADMIN$"]:
