@@ -73,8 +73,8 @@ It can read files with the following extensions :
 
 
 ## To Do :
-- [ ] Add features to list all files and share with READ,WRITE access mode and export in .txt file with index line.
-- [ ] Add possibilites to stop scan and re-play on the same last point.
+- [ ] List all files and share with READ,WRITE access mode and export in .txt file with index line.
+- [ ] Add possibilites to stop scan and re-start on the last point.
 - [ ] Refact with os.path lib (is_directory)
 - [ ] Create Class for arguments
 - [ ] Insert result in SQLite database for better view and reserch ?
