@@ -1,23 +1,15 @@
-```
 
-   _____              _                _    _                           _            
-  / ____|            | |              | |  | |                         | |           
- | |     _ __ ___  __| |___   ______  | |__| | __ _ _ ____   _____  ___| |_ ___ _ __ 
- | |    | '__/ _ \/ _` / __| |______| |  __  |/ _` | '__\ \ / / _ \/ __| __/ _ \ '__|
- | |____| | |  __/ (_| \__ \          | |  | | (_| | |   \ V /  __/\__ \ ||  __/ |   
-  \_____|_|  \___|\__,_|___/          |_|  |_|\__,_|_|    \_/ \___||___/\__\___|_|   
+ # CredsHarvester 
 
-                                                                                   
-```
-                                                                                                        
-                                                                                                        
-
-# CredsHarvester - Why ?
+ ![](./banner.png)
 
 
-<p align="center">
+
+## Why ?
+
+
 We created this tool to save time during internal network pentest, indeed we spent a lot (too much) of time to manually search in shares to find interesting information such as passwords, hidden folders, ssh keys, api keys, secrets and email addresses 
-</p>
+
 
 ## How ?
 
