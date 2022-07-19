@@ -15,6 +15,13 @@
 # CredsHarvester - Why ?
 
 
+<p align="center">
+We created this tool to save time during internal network pentest, indeed we spent a lot (too much) of time to manually search in shares to find interesting information such as passwords, hidden folders, ssh keys, api keys, secrets and email addresses 
+</p>
+
+## How ?
+
+
 Tool to browse, analyze and download all folders, files, available in network shares from several patterns (extensions, file name, regex and keywords in file contents) in an automated way.
 It supports SMB/Samba, FTP, SSH and SFTP.
 
