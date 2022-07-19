@@ -98,4 +98,4 @@ It can read files with the following extensions :
 
 ## Tips
 
-- You can easily test this tool on the vulnerable metasploitable infrastructure or on the infrastructure of your choice ;)
+- You can easily test this tool on the vulnerable metasploitable infrastructure ;)
