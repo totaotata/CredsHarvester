@@ -45,15 +45,21 @@ It can read files with the following extensions :
 * .xls via xlrd
 
 
+## Features :
 
-
+- [X] Support **SMB, FTP** and **SFTP**
+- [X] Filter files by extensions with `-w ext_file.txt`
+- [x] Select base folder to search from in the share with `--path`
+- [X] Search inside file with regex with `-r regex.txt`
+- [X] Search inside file with keywords with `-k keywords.txt`
+- [X] Export results to CSV (ShareName,Type,Path,Item found)
 ## Install :
 
 + `git clone https://github.com/totaotata/CredsHarvester`
 + `cd CredsHarvester`
 + `pip install -r requirements.txt`
 
-## How to use :
+## How to start :
 
 - Add the file extensions you want in ext_file.txt
 - Add keywords you want in keywords.txt
@@ -62,10 +68,12 @@ It can read files with the following extensions :
 
 ## Usage :
 
+### SMB :
+
 - ```python3 CredsHarvester.py smb -h 192.168.1.2 -u 'username' -p 'password' -d 'domain.com' -w ext_file.txt -k keywords.txt -r regex.txt -P(optional, default is 445)```
 
 
-### SFTP
+### SFTP :
 
 - ```python3 CredsHarvester.py sftp -h 192.168.1.2 -u 'username' -p 'password' -d 'domain.com' -w ext_file.txt -k keywords.txt -r regex.txt -P (optional port, default is 22)```
 
@@ -78,6 +86,7 @@ It can read files with the following extensions :
 
 
 ## To Do :
+
 - [ ] List all files and share with READ,WRITE access mode and export in .txt file with index line.
 - [ ] Add possibilites to stop scan and re-start on the last point.
 - [ ] Refact with os.path lib (is_directory)
@@ -86,12 +95,6 @@ It can read files with the following extensions :
 - [ ] Retrieve the content line when the keywords or regex are found
 - [ ] Search with a list of login/password
 
-
-## Done :
-- [X] Add entrypoint option to start scan
-- [X] Search in file with regex
-- [X] Improve error handling 
-- [X] Export results to CSV
 
 ## Tips
 
